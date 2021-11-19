@@ -10,6 +10,7 @@ from algorithms import svc_impl
 from algorithms import dt_impl
 from algorithms import rndm_forest_impl
 from _datetime import datetime
+import random
 
 if __name__ == "__main__":
     # -----------------------------------
@@ -54,51 +55,33 @@ if __name__ == "__main__":
         elif dataset["ChestPainType"][i] == "TA":
             dataset["ChestPainType"][i] = 3
 
-    #print(dataset.head())
-    #dataset['Cholesterol'] = np.where(dataset['Cholesterol'] == 0, dataset['Cholesterol'].mean(), dataset['Cholesterol'])
-
-    #plt.figure(figsize=(20, 20))
-    #sns.displot(dataset['Cholesterol'], color="red", label="Age", kde=True)
-    #plt.show()
-    col_column = dataset.loc[:,'Cholesterol']
-    #print(col_column.values)
+    print(datetime.now(), " - start Cholesterol ALG")
+    col_column = dataset.loc[:, 'Cholesterol']
     available_data = []
     missing_data = []
     for numbers in col_column.values:
-        if(numbers == 0):
+        if (numbers == 0):
             missing_data.append(numbers)
         else:
             available_data.append(numbers)
 
     random.seed(100)
-    for index,item in enumerate(missing_data):
+    for index, item in enumerate(missing_data):
         missing_data[index] = random.choice(available_data)
-
 
     average_available = sum(available_data) / len(available_data)
     average_missing = sum(missing_data) / len(missing_data)
 
-    for index,item in enumerate(missing_data):
+    for index, item in enumerate(missing_data):
         missing_data[index] = int(average_available + (item - average_missing))
 
     index_missing = 0
-    for index,item in enumerate(col_column):
-        if(item == 0):
+    for index, item in enumerate(col_column):
+        if (item == 0):
             col_column[index] = missing_data[index_missing]
             index_missing += 1
 
-    #plt.figure(figsize=(20, 20))
-    #sns.displot(dataset['Cholesterol'], color="red", label="Age", kde=True)
-    #plt.show()
-
-
-
-
-
-
-
-
-    #print(dataset.sample(10))
+    print(datetime.now(), " - end Cholesterol ALG")
 
     # -------------------------------------
     # Train/Test division
@@ -116,6 +99,6 @@ if __name__ == "__main__":
     X_test_scaled = scaler.transform(X_test)
 
     print(datetime.now(), " - Start SVC Alg")
-    svc_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
+    # svc_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
     # dt_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
     # rndm_forest_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
