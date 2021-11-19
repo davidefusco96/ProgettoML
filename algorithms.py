@@ -124,3 +124,17 @@ def rndm_forest_impl(np, X_train, y_train, X_test, y_test):
     # Confusion matrix
     print(ALG.score(X_test, y_test))
     print(confusion_matrix(y_test, y_predicted))
+
+
+def print_confusion_matrix(conf_matrix):
+    # Print the confusion matrix using Matplotlib
+    #
+    fig, ax = plt.subplots(figsize=(7.5, 7.5))
+    ax.matshow(conf_matrix, cmap=plt.cm.Blues, alpha=0.3)
+    for i in range(conf_matrix.shape[0]):
+        for j in range(conf_matrix.shape[1]):
+            ax.text(x=j, y=i, s=conf_matrix[i, j], va='center', ha='center', size='xx-large')
+
+    plt.xlabel('Predictions', fontsize=18)
+    plt.ylabel('Actuals', fontsize=18)
+    plt.show()
