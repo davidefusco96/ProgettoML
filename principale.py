@@ -61,6 +61,49 @@ if __name__ == "__main__":
         elif dataset["ChestPainType"][i] == "TA":
             dataset["ChestPainType"][i] = 3
 
+    #print(dataset.head())
+    #dataset['Cholesterol'] = np.where(dataset['Cholesterol'] == 0, dataset['Cholesterol'].mean(), dataset['Cholesterol'])
+
+    #plt.figure(figsize=(20, 20))
+    #sns.displot(dataset['Cholesterol'], color="red", label="Age", kde=True)
+    #plt.show()
+    col_column = dataset.loc[:,'Cholesterol']
+    #print(col_column.values)
+    available_data = []
+    missing_data = []
+    for numbers in col_column.values:
+        if(numbers == 0):
+            missing_data.append(numbers)
+        else:
+            available_data.append(numbers)
+
+    random.seed(100)
+    for index,item in enumerate(missing_data):
+        missing_data[index] = random.choice(available_data)
+
+
+    average_available = sum(available_data) / len(available_data)
+    average_missing = sum(missing_data) / len(missing_data)
+
+    for index,item in enumerate(missing_data):
+        missing_data[index] = int(average_available + (item - average_missing))
+
+    index_missing = 0
+    for index,item in enumerate(col_column):
+        if(item == 0):
+            col_column[index] = missing_data[index_missing]
+            index_missing += 1
+
+    #plt.figure(figsize=(20, 20))
+    #sns.displot(dataset['Cholesterol'], color="red", label="Age", kde=True)
+    #plt.show()
+
+
+
+
+
+
+
 
     #print(dataset.sample(10))
 
