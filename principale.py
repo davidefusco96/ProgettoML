@@ -9,28 +9,22 @@ from sklearn.metrics import confusion_matrix
 from algorithms import svc_impl
 from algorithms import dt_impl
 from algorithms import rndm_forest_impl
+from _datetime import datetime
 
 if __name__ == "__main__":
     # -----------------------------------
     # EDA
     # -----------------------------------
+    print(datetime.now(), " - load dataset")
     dataset = pd.read_csv("heart.csv")
     pd.set_option('display.max_columns', None)
     pd.options.display.width = None
     pd.options.mode.chained_assignment = None
-    #print("Number of rows:",dataset.shape[0])
-    #print("Number of columns:",dataset.shape[1])
-    #print(dataset.info())
-    #print(dataset.describe().T)
-    #print(dataset.describe(include=object).T)
-
-    #plt.figure(figsize=(12, 8))
-    #sns.heatmap(dataset.corr(), annot=True)
-    #plt.show()
 
     # ------------------------------------------
     # Feature Engineering
     # ------------------------------------------
+    print(datetime.now(), " - format dataset")
 
     dataset["Sex"] = [1 if i == "M" else 0 for i in dataset["Sex"]]
     dataset["ExerciseAngina"] = [1 if i == "Y" else 0 for i in dataset["ExerciseAngina"]]
@@ -49,7 +43,6 @@ if __name__ == "__main__":
             dataset["ST_Slope"][i] = 1
         elif dataset["ST_Slope"][i] == "Down":
             dataset["ST_Slope"][i] = 2
-
 
     for i in range(len(dataset["ChestPainType"])):
         if dataset["ChestPainType"][i] == "ATA":
@@ -114,18 +107,15 @@ if __name__ == "__main__":
     X = dataset.drop(["HeartDisease"], axis=1)
     y = dataset["HeartDisease"]
 
+    print(datetime.now(), " - split learn and test dataset")
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=0)
 
+    print(datetime.now(), " - normalize dataset")
     scaler = preprocessing.MinMaxScaler()
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-
-
-    print("--------------------------------SVC-------------------------------------------------------------")
-    #svc_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
-    #dt_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
-    rndm_forest_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
-
-
-
+    print(datetime.now(), " - Start SVC Alg")
+    svc_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
+    # dt_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
+    # rndm_forest_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
