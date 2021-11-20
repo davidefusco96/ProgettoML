@@ -50,47 +50,54 @@ def svc_impl(np, XL, YL, XT, YT):
     confusion_matrix(YT, YP)
 
 
-def dt_impl(np, X_train, y_train, X_test, y_test):
+def dt_impl(X_train, y_train, X_test, y_test):
     # Select the best hyperparameters
 
-    grid = {"max_depth": range(2, 10),
-            "min_samples_leaf": range(2, 100),
-            "min_samples_split": range(2, 100)
-            }
+    grid = {
+        "min_samples_split": range(2, 100),
+        "min_samples_leaf": range(2, 100)
+    }
 
     CV = GridSearchCV(estimator=DecisionTreeClassifier(),
                       param_grid=grid,
                       scoring='accuracy',
-                      cv=10,
-                      verbose=3)
+                      cv=5,
+                      verbose=0)
 
     H = CV.fit(X_train, y_train)
 
     # Learn the model with the best hyperparameters
-    print(datetime.now(), " - max_depth:", H.best_params_['max_depth'])
-    print(datetime.now(), " - min_samples_leaf:", H.best_params_['min_samples_leaf'])
-    print(datetime.now(), " - min_samples_split:", H.best_params_['min_samples_split'])
-    ALG = DecisionTreeClassifier(max_depth=H.best_params_['max_depth'],
-                                 min_samples_leaf=H.best_params_['min_samples_leaf'],
-                                 min_samples_split=H.best_params_['min_samples_split']
-                                 )
+    print(datetime.now(), " - Best hyperparameters:", H.best_params_)
+    ALG = DecisionTreeClassifier(
+        min_samples_leaf=H.best_params_['min_samples_leaf'],
+        min_samples_split=H.best_params_['min_samples_split']
+    )
 
     M = ALG.fit(X_train, y_train)
-    print(ALG.score(X_train, y_train))
-    # estimate the model
+    score_train = ALG.score(X_train, y_train)
+    print(datetime.now(), " - Score Train: ", score_train)
 
+    # estimate the model
     y_predicted = M.predict(X_test)
 
     # Confusion matrix
-    print(ALG.score(X_test, y_test))
-    print(confusion_matrix(y_test, y_predicted))
+    score_test = ALG.score(X_test, y_test)
+    print(datetime.now(), " - Score Test: ", score_test)
+    print(datetime.now(), " - Confusion Matrix")
+    conf_matrix = confusion_matrix(y_test, y_predicted)
 
-    # plt.figure()
-    # plot_tree(M,fontsize=2)
-    # plt.savefig('tmp', dpi=plt.figure().dpi)
+    title = "Score Train: " + str(score_train) + \
+            "\nScore Test: " + str(score_test) + \
+            "\nBest hyperparameters: " + str(H.best_params_)
+    print_confusion_matrix(conf_matrix, title)
+
+    print(datetime.now(), " - Plot Tree")
+    plt.figure()
+    plot_tree(M, fontsize=4)
+    plt.show()
 
 
-def rndm_forest_impl(np, X_train, y_train, X_test, y_test):
+def rndm_forest_impl(X_train, y_train, X_test, y_test):
     # Select the best hyperparameters
 
     grid = {
@@ -126,7 +133,7 @@ def rndm_forest_impl(np, X_train, y_train, X_test, y_test):
     print(confusion_matrix(y_test, y_predicted))
 
 
-def print_confusion_matrix(conf_matrix):
+def print_confusion_matrix(conf_matrix, title):
     # Print the confusion matrix using Matplotlib
     #
     fig, ax = plt.subplots(figsize=(7.5, 7.5))
@@ -135,6 +142,7 @@ def print_confusion_matrix(conf_matrix):
         for j in range(conf_matrix.shape[1]):
             ax.text(x=j, y=i, s=conf_matrix[i, j], va='center', ha='center', size='xx-large')
 
+    plt.title(title)
     plt.xlabel('Predictions', fontsize=18)
     plt.ylabel('Actuals', fontsize=18)
     plt.show()
