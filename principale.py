@@ -104,7 +104,7 @@ if __name__ == "__main__":
     X_train_scaled = scaler.fit_transform(X_train)
     X_test_scaled = scaler.transform(X_test)
 
-    print(datetime.now(), " - Start SVC Alg")
+    print(datetime.now(), " - Start Alg")
     # svc_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
-    # dt_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
-    # rndm_forest_impl(np, X_train_scaled, y_train, X_test_scaled, y_test)
+    dt_impl(X_train_scaled, y_train, X_test_scaled, y_test)
+    # rndm_forest_impl(X_train_scaled, y_train, X_test_scaled, y_test)
