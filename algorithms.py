@@ -24,15 +24,15 @@ def print_confusion_matrix(conf_matrix):
 def svc_impl(np, XL, YL, XT, YT):
     # Select the best hyperparameters
     grid = {
-        'C': np.logspace(-6, 3, 30),
-        'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
-        'gamma': np.logspace(-6, 3, 30)
+        'C': np.logspace(-6, 4, 30),
+        'kernel': ['linear', 'rbf'],
+        'gamma': np.logspace(-6, 4, 30)
     }
 
     CV = GridSearchCV(estimator=SVC(),
                       param_grid=grid,
                       scoring='accuracy',
-                      cv=10,
+                      cv=5,
                       verbose=0)
 
     print(datetime.now(), " - Start search best hyperparameters")
@@ -43,9 +43,12 @@ def svc_impl(np, XL, YL, XT, YT):
     print(datetime.now(), " - C:", H.best_params_['C'])
     print(datetime.now(), " - kernel:", H.best_params_['kernel'])
     print(datetime.now(), " - gamma:", H.best_params_['gamma'])
-    ALG = SVC(C=H.best_params_['C'],
-              kernel=H.best_params_['kernel'],
-              gamma=H.best_params_['gamma'])
+
+    ALG = SVC(
+              C = H.best_params_['C'],
+              kernel = H.best_params_['kernel'],
+              gamma = H.best_params_['gamma'])
+
     M = ALG.fit(XL, YL)
 
     # estimate the model
@@ -60,10 +63,11 @@ def svc_impl(np, XL, YL, XT, YT):
     print(datetime.now(), " - Model Error:", err)
 
     # Confusion matrix
-    confusion_matrix(YT, YP)
+    conf_matrix = confusion_matrix(YT, YP)
+    print_confusion_matrix(conf_matrix)
 
 
-def dt_impl(np, X_train, y_train, X_test, y_test):
+def dt_impl(X_train, y_train, X_test, y_test):
     # Select the best hyperparameters
 
     grid = {"max_depth": range(2, 10),
@@ -98,27 +102,23 @@ def dt_impl(np, X_train, y_train, X_test, y_test):
     print(ALG.score(X_test, y_test))
     print(confusion_matrix(y_test, y_predicted))
 
-    # plt.figure()
-    # plot_tree(M,fontsize=2)
-    # plt.savefig('tmp', dpi=plt.figure().dpi)
-
     print(datetime.now(), " - Plot Tree")
     plt.figure()
     plot_tree(M, fontsize=4)
     plt.show()
 
-def rndm_forest_impl(np, X_train, y_train, X_test, y_test):
+def rndm_forest_impl(X_train, y_train, X_test, y_test):
     # Select the best hyperparameters
 
     grid = {
-        "min_samples_leaf": range(50, 100, 2),
-
+        "min_samples_leaf": range(2,100),
+        #"min_samples_split": range(2,100)
     }
 
     CV = GridSearchCV(estimator=RandomForestClassifier(),
                       param_grid=grid,
                       scoring='accuracy',
-                      cv=10,
+                      cv=5,
                       verbose=0)
 
     H = CV.fit(X_train, y_train)
@@ -126,10 +126,12 @@ def rndm_forest_impl(np, X_train, y_train, X_test, y_test):
     # Learn the model with the best hyperparameters
 
     print(datetime.now(), " - min_samples_leaf:", H.best_params_['min_samples_leaf'])
+    #print(datetime.now(), " - min_samples_split:", H.best_params_['min_samples_split'])
 
-    ALG = RandomForestClassifier(n_estimators=1000,
-                                 min_samples_leaf=H.best_params_['min_samples_leaf'],
-
+    ALG = RandomForestClassifier(
+                                 n_estimators = 1000,
+                                 min_samples_leaf = H.best_params_['min_samples_leaf'],
+                                 #min_samples_split = H.best_params_['min_samples_split']
                                  )
 
     M = ALG.fit(X_train, y_train)
@@ -142,16 +144,3 @@ def rndm_forest_impl(np, X_train, y_train, X_test, y_test):
     print(ALG.score(X_test, y_test))
     print(confusion_matrix(y_test, y_predicted))
 
-
-def print_confusion_matrix(conf_matrix):
-    # Print the confusion matrix using Matplotlib
-    #
-    fig, ax = plt.subplots(figsize=(7.5, 7.5))
-    ax.matshow(conf_matrix, cmap=plt.cm.Blues, alpha=0.3)
-    for i in range(conf_matrix.shape[0]):
-        for j in range(conf_matrix.shape[1]):
-            ax.text(x=j, y=i, s=conf_matrix[i, j], va='center', ha='center', size='xx-large')
-
-    plt.xlabel('Predictions', fontsize=18)
-    plt.ylabel('Actuals', fontsize=18)
-    plt.show()
