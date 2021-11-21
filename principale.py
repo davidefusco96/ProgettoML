@@ -13,18 +13,21 @@ from _datetime import datetime
 import random
 
 if __name__ == "__main__":
-    # -----------------------------------
-    # EDA
-    # -----------------------------------
+
     print(datetime.now(), " - load dataset")
     dataset = pd.read_csv("heart.csv")
     pd.set_option('display.max_columns', None)
     pd.options.display.width = None
     pd.options.mode.chained_assignment = None
 
-    # ------------------------------------------
-    # Feature Engineering
-    # ------------------------------------------
+    # Questi print mostrano delle informazioni sul database
+    # print("Number of rows:",dataset.shape[0])
+    # print("Number of columns:",dataset.shape[1])
+    # print(dataset.info())
+    # print(dataset.describe().T)
+    # print(dataset.describe(include=object).T)
+
+    #Passaggio da features stringhe a features numeriche
     print(datetime.now(), " - format dataset")
 
     dataset["Sex"] = [1 if i == "M" else 0 for i in dataset["Sex"]]
@@ -81,7 +84,10 @@ if __name__ == "__main__":
             col_column[index] = missing_data[index_missing]
             index_missing += 1
 
-    print(datetime.now(), " - end Cholesterol ALG")
+    #stampa la nuova distribuzione del colesterolo
+    #plt.figure(figsize=(20, 20))
+    #sns.displot(dataset['Cholesterol'], color="red", label="Age", kde=True)
+    #plt.show()
 
     # -------------------------------------
     # Train/Test division
